@@ -20,7 +20,7 @@ import lombok.Setter;
 @Inheritance(strategy = jakarta.persistence.InheritanceType.JOINED)
 @DiscriminatorColumn(name = "typeActeur", discriminatorType = jakarta.persistence.DiscriminatorType.STRING)
 @Entity
-public abstract class Acteurs {
+public class Acteurs {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)

@@ -15,7 +15,7 @@ public interface ActeurRepos extends JpaRepository<Acteurs, Long> {
 
     @Query("""
             SELECT act
-            FROM ACTEURS act
+            FROM Acteurs act
             WHERE LOWER(act.nom) LIKE LOWER(CONCAT('%',:motCle,'%')) OR LOWER(act.prenom) LIKE LOWER(CONCAT('%',:motCle,'%'))
             """)
     List<Acteurs> rechercherParMotCle(String motCle);

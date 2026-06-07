@@ -16,4 +16,10 @@ public interface ActeurServ {
     Optional<Acteurs> rechercherActeurParEmail(String email);
 
     List<Acteurs> rechercherParMotCle(String motCle);
+
+    String confirmationEmail(long id, String token);
+
+    List<Acteurs> listeActeurParEcole(long school_id);
+
+    Acteurs rechercherActeurParId(long id);
 }

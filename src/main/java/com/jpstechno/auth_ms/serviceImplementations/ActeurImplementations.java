@@ -3,10 +3,15 @@ package com.jpstechno.auth_ms.serviceImplementations;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.jpstechno.auth_ms.eventsManager.eventsPublisher.NewActeurEvent;
 import com.jpstechno.auth_ms.modeles.Acteurs;
 import com.jpstechno.auth_ms.repositories.ActeurRepos;
+import com.jpstechno.auth_ms.repositories.UrlVerificationRepos;
 import com.jpstechno.auth_ms.services.ActeurServ;
 
 import lombok.RequiredArgsConstructor;
@@ -16,17 +21,32 @@ import lombok.RequiredArgsConstructor;
 public class ActeurImplementations implements ActeurServ {
 
     private final ActeurRepos acteurRepos;
+    private final UrlVerificationRepos urlverif;
+    private ApplicationEventPublisher publisher;
+    private Logger log = LoggerFactory.getLogger(Acteurs.class);
 
     @Override
     public Acteurs enregistrer(Acteurs acteur) {
         // rechercher si acteur ayant email existait
         boolean acteurMailExisted = acteurRepos.findByEmail(acteur.getEmailPersonnel()).isPresent();
         if (!acteurMailExisted) { // si pas acteur avec same email
-            return acteurRepos.save(acteur);
-        } else {
-            throw new RuntimeException("Cette adresse email existe deja");
-        }
+            acteur.setActif(true);
+            acteur.setEmailVerified(false);
+            Acteurs act = acteurRepos.save(acteur);
 
+            // enregistrer le log
+            log.info("Enregistrement d'un nouveau acteur", act);
+
+            // publier evenement en vue confirmation email
+            NewActeurEvent acteurEvent = new NewActeurEvent(act);
+            publisher.publishEvent(acteurEvent);
+
+            return act;
+        } else {
+            log.error("Echec creation d'un nouvel acteur", acteur);
+            throw new RuntimeException("Cette adresse email existe deja");
+
+        }
     }
 
     @Override
@@ -78,6 +98,37 @@ public class ActeurImplementations implements ActeurServ {
         acteurRepos.save(act);
 
         return act.isActif() ? "Utilisateur active avec succes" : "Utilisateur desactive avec succes";
+    }
+
+    @Override
+    public String confirmationEmail(long id, String token) {
+        // verification du token
+        boolean tokenValide = urlverif.rechercherParId_Token(id, token).isPresent();
+
+        if (tokenValide) {
+            Acteurs act = acteurRepos.findById(id).orElse(null);
+            if (act == null) {
+                throw new RuntimeException("Utilisateur non trouve");
+            }
+
+            act.setEmailVerified(true);
+            acteurRepos.save(act);
+            return "validation email reussie";
+
+        } else {
+            throw new RuntimeException("Lien invalide");
+        }
+    }
+
+    @Override
+    public List<Acteurs> listeActeurParEcole(long school_id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'listeActeurParEcole'");
+    }
+
+    @Override
+    public Acteurs rechercherActeurParId(long id) {
+        return acteurRepos.findById(id).orElse(null);
     }
 
 }
