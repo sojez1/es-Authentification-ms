@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jpstechno.auth_ms.modeles.Acteurs;
 import com.jpstechno.auth_ms.services.ActeurServ;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,7 +25,7 @@ public class ActeurControl {
 
     @PostMapping("/enregistrer/nouveau")
     @PreAuthorize("permitAll()")
-    public Acteurs register(@RequestBody Acteurs acteur) {
+    public Acteurs register(@Valid @RequestBody Acteurs acteur) {
         return acteurServ.enregistrer(acteur);
     }
 
@@ -41,7 +42,7 @@ public class ActeurControl {
     }
 
     @GetMapping("courant/{id}")
-    @PreAuthorize("hasRole('WEBMASTER' or #id == authentication.principal.id)") // if current user id = param id
+    @PreAuthorize("hasRole('WEBMASTER') or #id == authentication.principal.id)") // if current user id = param id
     public Acteurs getCurrentActeurDetails(@PathVariable long id) {
         return acteurServ.rechercherActeurParId(id);
 

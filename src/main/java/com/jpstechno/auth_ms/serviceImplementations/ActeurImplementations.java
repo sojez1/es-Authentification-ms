@@ -9,6 +9,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import com.jpstechno.auth_ms.eventsManager.eventsPublisher.NewActeurEvent;
+import com.jpstechno.auth_ms.exceptions.LienInvalideException;
+import com.jpstechno.auth_ms.exceptions.acteurs.ActeurNotFoundException;
+import com.jpstechno.auth_ms.exceptions.acteurs.EmailExistedException;
 import com.jpstechno.auth_ms.modeles.Acteurs;
 import com.jpstechno.auth_ms.repositories.ActeurRepos;
 import com.jpstechno.auth_ms.repositories.UrlVerificationRepos;
@@ -22,8 +25,8 @@ public class ActeurImplementations implements ActeurServ {
 
     private final ActeurRepos acteurRepos;
     private final UrlVerificationRepos urlverif;
-    private ApplicationEventPublisher publisher;
-    private Logger log = LoggerFactory.getLogger(Acteurs.class);
+    private final ApplicationEventPublisher publisher;
+    private final Logger log = LoggerFactory.getLogger(Acteurs.class);
 
     @Override
     public Acteurs enregistrer(Acteurs acteur) {
@@ -35,7 +38,7 @@ public class ActeurImplementations implements ActeurServ {
             Acteurs act = acteurRepos.save(acteur);
 
             // enregistrer le log
-            log.info("Enregistrement d'un nouveau acteur", act);
+            log.info("Enregistrement d'un nouveau acteur {}", act);
 
             // publier evenement en vue confirmation email
             NewActeurEvent acteurEvent = new NewActeurEvent(act);
@@ -43,8 +46,8 @@ public class ActeurImplementations implements ActeurServ {
 
             return act;
         } else {
-            log.error("Echec creation d'un nouvel acteur", acteur);
-            throw new RuntimeException("Cette adresse email existe deja");
+            log.error("Echec creation d'un nouvel acteur {}", acteur);
+            throw new EmailExistedException("Cette adresse email existe deja");
 
         }
     }
@@ -64,7 +67,7 @@ public class ActeurImplementations implements ActeurServ {
                     newDetails.getPrenom(), newDetails.getNom());
 
         } else {
-            throw new RuntimeException("L'utilisateur que vous tentez de modifier n'existe pas");
+            throw new ActeurNotFoundException("L'utilisateur que vous tentez de modifier n'existe pas");
         }
     }
 
@@ -108,7 +111,7 @@ public class ActeurImplementations implements ActeurServ {
         if (tokenValide) {
             Acteurs act = acteurRepos.findById(id).orElse(null);
             if (act == null) {
-                throw new RuntimeException("Utilisateur non trouve");
+                throw new ActeurNotFoundException("Utilisateur non trouve");
             }
 
             act.setEmailVerified(true);
@@ -116,14 +119,13 @@ public class ActeurImplementations implements ActeurServ {
             return "validation email reussie";
 
         } else {
-            throw new RuntimeException("Lien invalide");
+            throw new LienInvalideException("Lien invalide");
         }
     }
 
     @Override
     public List<Acteurs> listeActeurParEcole(long school_id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'listeActeurParEcole'");
+        return null;
     }
 
     @Override

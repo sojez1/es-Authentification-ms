@@ -12,6 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,14 +28,18 @@ public class Acteurs {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long acteurId;
 
+    @NotBlank(message = "Vous devez saisir un nom")
     private String nom;
 
+    @NotBlank(message = "Vous devez saisir un prenom")
     private String prenom;
 
     @Enumerated(jakarta.persistence.EnumType.STRING)
     private Sexes sexe;
 
     @NaturalId
+    @Email(message = "email invalide")
+    @NotBlank(message = "Vous devez saisir une adresse email")
     private String emailPersonnel;
 
     private String telephone;
