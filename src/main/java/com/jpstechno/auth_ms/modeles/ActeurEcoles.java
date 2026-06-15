@@ -8,8 +8,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,20 +42,31 @@ public class ActeurEcoles {
 
     @ManyToOne
     @JoinColumn(name = "acteur_id")
+    @NotNull(message = "L'utilisateur ne doit pas etre null")
     private Acteurs acteur;
 
     @ManyToOne
     @JoinColumn(name = "ecole_id")
+    @NotNull(message = "L'ecole ne doit pas etre nulle")
     private Ecoles ecole;
 
+    @NotBlank(message = "le mot de passe ne doit pas etre vide")
+    @Size(min = 8, max = 16, message = "Le mot de passe doit etre compris entre 8 et 16 caracteres")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z\\d]).+$", message = "le mot de passe doit contenir au moins 1 majuscule, 1 miniscule, 1 chiffre et 1 caractere special")
     private String password;
 
+    @NotBlank
     private LocalDate dateDernierPassword;
 
     private String emailInstitutionnel;
 
     private boolean isActeurEcoleActif;
 
+    @NotBlank(message = "vous devez indiquer la fonction ou le role de cet utilisateur")
     private Fonctions fonction;
 
+    @PrePersist
+    public void valeurParDefaut() {
+        dateDernierPassword = LocalDate.now();
+    }
 }

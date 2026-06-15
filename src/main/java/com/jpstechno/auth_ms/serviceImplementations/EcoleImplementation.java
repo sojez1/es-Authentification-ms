@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jpstechno.auth_ms.eventsManager.eventsPublisher.NewEcoleEvent;
@@ -19,6 +20,7 @@ import com.jpstechno.auth_ms.modeles.Dto.EcoleActeurDto;
 import com.jpstechno.auth_ms.repositories.ActeurEcoleRepos;
 import com.jpstechno.auth_ms.repositories.ActeurRepos;
 import com.jpstechno.auth_ms.repositories.EcoleRepos;
+import com.jpstechno.auth_ms.services.ActeurServ;
 import com.jpstechno.auth_ms.services.EcoleServ;
 
 import jakarta.transaction.Transactional;
@@ -30,6 +32,8 @@ public class EcoleImplementation implements EcoleServ {
 
     private final EcoleRepos ecoleRepos;
     private final ActeurRepos acteurRepos;
+    private final ActeurServ acteurServ;
+    private final PasswordEncoder passwordEncoder;
     private final ActeurEcoleRepos acteurEcolerepos;
     private final ApplicationEventPublisher publisher;
 
@@ -37,13 +41,13 @@ public class EcoleImplementation implements EcoleServ {
     @Transactional
     public Ecoles EnregistrerEcole(EcoleActeurDto ecoleDto) {
 
-        // s'assurer qu'un promoteur est associe a la creation
+        // 1- s'assurer qu'un promoteur est associe a la creation
         if (ecoleDto.getActeurs() == null) {
             throw new RuntimeException("Il doit y avoir un promoteur ajouter a la creation");
         }
-        // recuperer l'acteur existant ou en creer un nouveau
+        // 2- recuperer l'acteur existant ou en creer un nouveau
         Acteurs acteur = acteurRepos.findByEmail(ecoleDto.getActeurs().getEmailPersonnel()).orElseGet(() -> {
-            return acteurRepos.save(ecoleDto.getActeurs());
+            return acteurServ.enregistrer(ecoleDto.getActeurs());
         });
 
         // Enregistrer l'ecole
@@ -57,7 +61,9 @@ public class EcoleImplementation implements EcoleServ {
         acteurEcole.setActeurEcoleActif(false);
         acteurEcole.setDateDernierPassword(LocalDate.now());
         acteurEcole.setEmailInstitutionnel(ecoleDto.getEmailInstitutionnel());
-        acteurEcole.setPassword(ecoleDto.getPassword());
+
+        String encryptedPassword = passwordEncoder.encode(ecoleDto.getPassword());
+        acteurEcole.setPassword(encryptedPassword);
         acteurEcolerepos.save(acteurEcole);
 
         // Publier evenement de creation de nouvelle ecole
