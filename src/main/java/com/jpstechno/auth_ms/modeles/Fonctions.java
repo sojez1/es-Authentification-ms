@@ -6,5 +6,7 @@ public enum Fonctions {
     SURVEILLANT,
     SECRETAIRE,
     COMPTABLE,
-    WEBMASTER
+    WEBMASTER,
+    ENSEIGNANT,
+    ETUDIANT
 }

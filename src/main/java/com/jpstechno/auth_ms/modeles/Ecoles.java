@@ -2,6 +2,8 @@ package com.jpstechno.auth_ms.modeles;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,5 +48,6 @@ public class Ecoles {
     private String logoEcole; // URL ou chemin vers le logo de l'école
 
     @OneToMany(mappedBy = "ecole")
+    @JsonIgnore
     private List<ActeurEcoles> listeActeurEcole; // relation avec la liste des acteurs de l'ecole
 }

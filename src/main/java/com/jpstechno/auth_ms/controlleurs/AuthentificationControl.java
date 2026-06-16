@@ -25,12 +25,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class AuthentificationControl {
 
-    private final AuthenticationService authenticationService;
     private final AuthenticationManager authManager;
     private final JwtService jwtServ;
 
     @PostMapping("/login")
     public String login(@Valid @RequestBody LoginRequest loginRequest) {
+
+        System.out.println("Controlleur appelee");
 
         Authentication auth = authManager.authenticate(
                 new MyUsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword(),
@@ -53,9 +54,9 @@ public class AuthentificationControl {
     }
 
     @GetMapping("/logtest")
-    @PreAuthorize("permitAll()")
-    public String loginTest() {
-        return authenticationService.loginTest();
+    public String logtest() {
+        System.out.println("LOGTEST APPELE");
+        return "OK JP";
     }
 
 }

@@ -1,6 +1,7 @@
 package com.jpstechno.auth_ms.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ public class LoginRequest {
     @NotBlank
     private String password;
 
-    @NotBlank
+    @Positive
     private long ecoleId;
 
 }

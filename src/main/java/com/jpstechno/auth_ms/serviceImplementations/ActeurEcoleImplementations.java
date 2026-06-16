@@ -28,11 +28,14 @@ public class ActeurEcoleImplementations implements ActeurEcoleServ {
         // 1- verifier si acteur existe deja ou non
         Acteurs acteur = acteurServ.rechercherActeurParEmail(acteurEcole.getActeur().getEmailPersonnel()).orElse(null);
         if (acteur == null) {
-            acteur = acteurServ.enregistrer(acteur);
+            acteur = acteurServ.enregistrer(acteurEcole.getActeur());
         }
 
         // 2- Verifier si ecole existe deja ou non
-        Ecoles ecole = ecoleRepo.findById(null).orElse(null);
+        Ecoles ecole = ecoleRepo.findByEmailEcole(acteurEcole.getEcole().getEmailEcole()).orElse(null);
+        if (ecole == null) {
+            ecole = ecoleRepo.save(acteurEcole.getEcole());
+        }
 
         // 3- Crypter le mot de passe
         String encryptedPassword = passwordEncoder.encode(acteurEcole.getPassword());

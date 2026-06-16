@@ -36,7 +36,9 @@ public class SecuriteConfig {
                         .requestMatchers(
                                 "/authentifier/logtest",
                                 "/authentifier/login",
-                                "/acteurs/enregistrer/nouveau")
+                                "/acteurs/enregistrer/nouveau",
+                                "/ecoles/utilisateurs/ajouter",
+                                "/error")
                         .permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(myAuthenticationProvider)

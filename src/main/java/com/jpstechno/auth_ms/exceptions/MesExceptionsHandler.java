@@ -39,4 +39,13 @@ public class MesExceptionsHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handle(Exception ex) {
+
+        ex.printStackTrace();
+
+        return ResponseEntity.badRequest()
+                .body(ex.getClass().getName() + " : " + ex.getMessage());
+    }
+
 }

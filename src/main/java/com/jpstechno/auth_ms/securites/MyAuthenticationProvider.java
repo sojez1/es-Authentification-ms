@@ -46,9 +46,28 @@ public class MyAuthenticationProvider implements AuthenticationProvider {
 
     }
 
+    public @Nullable Authentication authenticate(String emailOrUsername, String password, long schoolId)
+            throws AuthenticationException {
+
+        // recherche de l'utilisateur
+        ActeurEcoles act = acteurEcoleRepo.findByEmailAndSchoolId(emailOrUsername, schoolId)
+                .orElseThrow(() -> new ActeurNotFoundException("Impossible de se connecter. Utilisateur non trouve"));
+
+        // verification du mot de passe
+        if (!passwordEncoder.matches(password, act.getPassword())) {
+            throw new BadCredentialsException("Mot de passe incorrect");
+        }
+
+        MyUserPrincipal principal = new MyUserPrincipal(act);
+
+        return new MyUsernamePasswordAuthenticationToken(principal, null,
+                principal.getAuthorities(), schoolId);
+
+    }
+
     @Override
     public boolean supports(Class<?> authentication) {
-        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+        return MyUsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
 }
