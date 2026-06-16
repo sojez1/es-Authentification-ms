@@ -11,34 +11,49 @@ import org.springframework.stereotype.Service;
 
 import com.jpstechno.auth_ms.modeles.ActeurEcoles;
 
-import lombok.RequiredArgsConstructor;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Service
-@RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${jwt.secret-key}")
     private final String secret_key;
 
-    public String generateAccessToken(ActeurEcoles acteur) {
+    public JwtService(@Value("${jwt.secret-key}") String secret) {
+        this.secret_key = secret;
+    }
+
+    public String generateAccessToken(ActeurEcoles acteurEcole) {
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", acteur.getActeur().getEmailPersonnel());
-        claims.put("nom", acteur.getActeur().getPrenom() + " " + acteur.getActeur().getNom().substring(0, 1));
-        claims.put("school_id", acteur.getEcole().getId());
-        claims.put("role", acteur.getFonction());
+        claims.put("email", acteurEcole.getActeur().getEmailPersonnel());
+        claims.put("nom", acteurEcole.getActeur().getPrenom() + " " + acteurEcole.getActeur().getNom().substring(0, 1));
+        claims.put("school_id", acteurEcole.getEcole().getId());
+        claims.put("role", acteurEcole.getFonction());
 
         return Jwts.builder().header().and()
-                .subject(acteur.getId().toString())
+                .subject(acteurEcole.getId().toString())
                 .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + SecurityParams.DUREE_ACCESS_TOKEN))
+                .expiration(new Date(System.currentTimeMillis() + SecurityParams.DUREE_ACCESS_TOKEN * 60 * 1000))
                 .signWith(getKey())
                 .compact();
+    }
 
+    public boolean isTokenValide(String token, MyUserPrincipal principal) {
+
+        // 1- verifier si le token est expire et retournee true si expire
+        if (isTokenExpired(token)) {
+            return false;
+        }
+
+        // 2- verifier le claims
+        return (extractUserId(token) == principal.getActeurId()) && (extractSchoolId(token) == principal.getSchoolId());
+    }
+
+    public boolean isTokenExpired(String token) {
+        return extractClaims(token).getExpiration().before(new Date(System.currentTimeMillis()));
     }
 
     public Claims extractClaims(String token) {
@@ -46,8 +61,9 @@ public class JwtService {
 
     }
 
-    public String extractUserId(String token) {
-        return extractClaims(token).getSubject();
+    public long extractUserId(String token) {
+        String subject = extractClaims(token).getSubject();
+        return Long.parseLong(subject);
     }
 
     public long extractSchoolId(String token) {

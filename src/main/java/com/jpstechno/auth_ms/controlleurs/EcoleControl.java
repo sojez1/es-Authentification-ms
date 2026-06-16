@@ -2,12 +2,14 @@ package com.jpstechno.auth_ms.controlleurs;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jpstechno.auth_ms.modeles.ActeurEcoles;
 import com.jpstechno.auth_ms.services.ActeurEcoleServ;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -20,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EcoleControl {
 
-    private final ActeurEcoleServ acteurEcoleServ;
+    final ActeurEcoleServ acteurEcoleServ;
 
     @GetMapping("/newEcole/confirmation/acteur")
     public String confirmationActeur() {
@@ -30,8 +32,8 @@ public class EcoleControl {
     }
 
     @PostMapping("/utilisateurs/ajouter")
-    public ActeurEcoles ajouterUtilisateur() {
-        return null;
+    public ActeurEcoles ajouterUtilisateur(@Valid @RequestBody ActeurEcoles utilisateur) {
+        return acteurEcoleServ.saveUserForSchool(utilisateur);
     }
 
 }

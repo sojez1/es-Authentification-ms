@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jpstechno.auth_ms.dto.LoginRequest;
 import com.jpstechno.auth_ms.securites.JwtService;
+import com.jpstechno.auth_ms.securites.MyUserPrincipal;
+import com.jpstechno.auth_ms.securites.MyUsernamePasswordAuthenticationToken;
 //import com.jpstechno.auth_ms.services.AuthenticationService;
 import com.jpstechno.auth_ms.services.AuthenticationService;
 
@@ -15,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -30,12 +31,17 @@ public class AuthentificationControl {
 
     @PostMapping("/login")
     public String login(@Valid @RequestBody LoginRequest loginRequest) {
+
         Authentication auth = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new MyUsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword(),
+                        loginRequest.getEcoleId()));
+
         if (auth.isAuthenticated()) {
-            return jwtServ.generateAccessToken(null);
+            MyUserPrincipal principal = (MyUserPrincipal) auth.getPrincipal();
+            return jwtServ.generateAccessToken(principal.getConnectedActeurEcole());
         } else {
             return null;
+
         }
 
     }
