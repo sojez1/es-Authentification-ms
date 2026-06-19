@@ -2,6 +2,8 @@ package com.jpstechno.auth_ms.modeles;
 
 import java.time.LocalDate;
 
+import org.hibernate.annotations.NaturalId;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -60,6 +62,7 @@ public class ActeurEcoles {
 
     private LocalDate dateDernierPassword;
 
+    @NaturalId(mutable = true)
     private String emailInstitutionnel;
 
     private boolean isActeurEcoleActif;

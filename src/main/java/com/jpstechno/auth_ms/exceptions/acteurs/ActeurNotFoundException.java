@@ -6,4 +6,8 @@ public class ActeurNotFoundException extends RuntimeException {
         super(message);
     }
 
+    public ActeurNotFoundException() {
+        super("Cet utilisateur n'existe pas");
+    }
+
 }

@@ -8,4 +8,6 @@ public interface AuthenticationService {
 
     String loginTest();
 
+    String resetPassword(String email, long schoolID);
+
 }

@@ -37,7 +37,7 @@ public class Acteurs {
     @Enumerated(jakarta.persistence.EnumType.STRING)
     private Sexes sexe;
 
-    @NaturalId
+    @NaturalId(mutable = true)
     @Email(message = "email invalide")
     @NotBlank(message = "Vous devez saisir une adresse email")
     private String emailPersonnel;

@@ -2,13 +2,15 @@ package com.jpstechno.auth_ms.securites;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authorization.EnableMultiFactorAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
+import org.springframework.security.core.authority.FactorGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -17,6 +19,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableMethodSecurity
+@EnableMultiFactorAuthentication(authorities = {
+        FactorGrantedAuthority.PASSWORD_AUTHORITY,
+        FactorGrantedAuthority.OTT_AUTHORITY
+})
 public class SecuriteConfig {
 
     private final MyAuthenticationProvider myAuthenticationProvider;
@@ -33,23 +39,20 @@ public class SecuriteConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/authentifier/logtest",
-                                "/authentifier/login",
-                                "/acteurs/enregistrer/nouveau",
-                                "/ecoles/utilisateurs/ajouter",
-                                "/error")
+                        .requestMatchers(SecurityParams.PUBLIC_URLs)
                         .permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(myAuthenticationProvider)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // .formLogin(form -> form.loginPage("/authentifier/login"));
+        // .oneTimeTokenLogin(Customizer.withDefaults());
         // .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
-    public CorsConfigurationSource corsConfig() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(SecurityParams.URL_AUTORISES);
         cors.setAllowedHeaders(SecurityParams.ENTETES_AUTORISES);

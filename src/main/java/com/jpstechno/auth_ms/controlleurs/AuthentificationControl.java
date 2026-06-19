@@ -10,12 +10,10 @@ import com.jpstechno.auth_ms.securites.JwtService;
 import com.jpstechno.auth_ms.securites.MyUserPrincipal;
 import com.jpstechno.auth_ms.securites.MyUsernamePasswordAuthenticationToken;
 //import com.jpstechno.auth_ms.services.AuthenticationService;
-import com.jpstechno.auth_ms.services.AuthenticationService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +29,6 @@ public class AuthentificationControl {
     @PostMapping("/login")
     public String login(@Valid @RequestBody LoginRequest loginRequest) {
 
-        System.out.println("Controlleur appelee");
-
         Authentication auth = authManager.authenticate(
                 new MyUsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword(),
                         loginRequest.getEcoleId()));
@@ -44,6 +40,23 @@ public class AuthentificationControl {
             return null;
 
         }
+
+    }
+
+    @PostMapping("/login/otp")
+    public String verifyOtp(String otp) {
+        return null;
+    }
+
+    @PostMapping("/password/forget/request")
+    public String passwordForgetRequest(String usernameOrEmail, long schoolId) {
+
+        return null;
+    }
+
+    @GetMapping("/password/reset/{id}/{token}")
+    public String resetActeurEcolePassword(long id, String token, String newPassword) {
+        return null;
 
     }
 
